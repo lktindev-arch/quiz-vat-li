@@ -1,1714 +1,1040 @@
 <!DOCTYPE html>
 <html lang="vi">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Quiz Vật Lý Lớp 10 - Luyện Tập</title>
-    <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
-    <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
-        
-        @keyframes gradient {
-            0% { background-position: 0% 50%; }
-            50% { background-position: 100% 50%; }
-            100% { background-position: 0% 50%; }
-        }
-        
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-10px); }
-        }
-        
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            25% { transform: translateX(-10px); }
-            75% { transform: translateX(10px); }
-        }
-        
-        @keyframes pulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-        }
-        
-        @keyframes confetti {
-            0% { transform: translateY(-100%) rotate(0deg); opacity: 1; }
-            100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
-        }
-        
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(-45deg, #667eea, #764ba2, #f093fb, #4facfe);
-            background-size: 400% 400%;
-            animation: gradient 15s ease infinite;
-            min-height: 100vh;
-            padding: 20px;
-        }
-        
-        .confetti {
-            position: fixed;
-            width: 10px;
-            height: 10px;
-            z-index: 9999;
-            animation: confetti 3s linear forwards;
-        }
-        
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-        }
-        
-        .header {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-            margin-bottom: 30px;
-            text-align: center;
-            animation: bounce 2s ease-in-out infinite;
-        }
-        
-        .header h1 {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin-bottom: 10px;
-            font-size: 2.5em;
-            font-weight: 800;
-        }
-        
-        .header p {
-            color: #666;
-            font-size: 1.2em;
-            font-weight: 500;
-        }
-        
-        .mode-selector {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
-            padding: 30px;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-            margin-bottom: 30px;
-        }
-        
-        .mode-selector h2 {
-            color: #333;
-            margin-bottom: 25px;
-            text-align: center;
-            font-size: 1.8em;
-            font-weight: 700;
-        }
-        
-        .mode-buttons {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 20px;
-        }
-        
-        .mode-btn {
-            padding: 25px 20px;
-            border: none;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1.1em;
-            font-weight: bold;
-            color: white;
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .mode-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            transition: 0.5s;
-        }
-        
-        .mode-btn:hover::before {
-            left: 100%;
-        }
-        
-        .mode-btn:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 10px 30px rgba(102, 126, 234, 0.6);
-        }
-        
-        .mode-btn small {
-            display: block;
-            margin-top: 8px;
-            opacity: 0.9;
-            font-size: 0.85em;
-        }
-        
-        .quiz-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
-            padding: 35px;
-            border-radius: 20px;
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-            margin-bottom: 20px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .quiz-card::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(102, 126, 234, 0.1) 0%, transparent 70%);
-            animation: pulse 3s ease-in-out infinite;
-        }
-        
-        .quiz-card > * {
-            position: relative;
-            z-index: 1;
-        }
-        
-        .question-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 25px;
-            padding-bottom: 20px;
-            border-bottom: 3px solid #eee;
-        }
-        
-        .question-number {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-weight: bold;
-            font-size: 1.1em;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .question-type {
-            background: linear-gradient(135deg, #f093fb, #f5576c);
-            color: white;
-            padding: 10px 20px;
-            border-radius: 25px;
-            font-size: 1em;
-            font-weight: 600;
-            box-shadow: 0 5px 15px rgba(240, 147, 251, 0.3);
-        }
-        
-        .question-text {
-            font-size: 1.3em;
-            color: #333;
-            margin-bottom: 30px;
-            line-height: 1.7;
-            font-weight: 500;
-        }
-        
-        .question-image {
-            width: 100%;
-            max-width: 500px;
-            margin: 20px auto;
-            display: block;
-            border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-            transition: all 0.3s;
-        }
-        
-        .question-image:hover {
-            transform: scale(1.05);
-            box-shadow: 0 15px 40px rgba(0,0,0,0.3);
-        }
-        
-        .answered-badge {
-            position: absolute;
-            top: 20px;
-            right: 20px;
-            background: linear-gradient(135deg, #4caf50, #45a049);
-            color: white;
-            padding: 8px 16px;
-            border-radius: 20px;
-            font-size: 0.9em;
-            font-weight: bold;
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
-            animation: pulse 1.5s ease-in-out infinite;
-        }
-        
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .option {
-            padding: 18px 24px;
-            border: 3px solid #ddd;
-            border-radius: 15px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-size: 1.1em;
-            font-weight: 500;
-            background: white;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .option::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(102, 126, 234, 0.2), transparent);
-            transition: 0.5s;
-        }
-        
-        .option:hover::before {
-            left: 100%;
-        }
-        
-        .option:hover {
-            border-color: #667eea;
-            background: #f8f9ff;
-            transform: translateX(10px);
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.2);
-        }
-        
-        .option.selected {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-color: #667eea;
-            transform: scale(1.02);
-            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
-        }
-        
-        .option.correct {
-            background: linear-gradient(135deg, #4caf50, #45a049) !important;
-            color: white !important;
-            border-color: #4caf50 !important;
-            animation: pulse 0.5s ease-in-out;
-            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.4) !important;
-        }
-        
-        .option.incorrect {
-            background: linear-gradient(135deg, #f44336, #e53935) !important;
-            color: white !important;
-            border-color: #f44336 !important;
-            animation: shake 0.5s ease-in-out;
-            box-shadow: 0 8px 25px rgba(244, 67, 54, 0.4) !important;
-        }
-        
-        .option.disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        
-        .feedback-message {
-            margin-top: 20px;
-            padding: 20px;
-            border-radius: 15px;
-            font-size: 1.1em;
-            font-weight: 600;
-            text-align: center;
-            animation: bounce 0.5s ease-in-out;
-        }
-        
-        .feedback-message.correct {
-            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-            color: #2e7d32;
-            border: 3px solid #4caf50;
-        }
-        
-        .feedback-message.incorrect {
-            background: linear-gradient(135deg, #ffebee, #ffcdd2);
-            color: #c62828;
-            border: 3px solid #f44336;
-        }
-        
-        .true-false-grid {
-            display: grid;
-            gap: 20px;
-        }
-        
-        .tf-statement {
-            background: linear-gradient(135deg, #f8f9ff, #ffffff);
-            padding: 18px;
-            border-radius: 12px;
-            margin-bottom: 12px;
-            font-weight: 500;
-            border-left: 4px solid #667eea;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
-        }
-        
-        .tf-buttons {
-            display: flex;
-            gap: 12px;
-            margin-top: 12px;
-        }
-        
-        .tf-btn {
-            flex: 1;
-            padding: 14px;
-            border: 3px solid #ddd;
-            border-radius: 12px;
-            cursor: pointer;
-            transition: all 0.3s;
-            font-weight: bold;
-            font-size: 1.05em;
-            background: white;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .tf-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.5), transparent);
-            transition: 0.5s;
-        }
-        
-        .tf-btn:hover::before {
-            left: 100%;
-        }
-        
-        .tf-btn:hover {
-            border-color: #667eea;
-            transform: scale(1.05);
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-        }
-        
-        .tf-btn.selected-true {
-            background: linear-gradient(135deg, #4caf50, #45a049);
-            color: white;
-            border-color: #4caf50;
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
-        }
-        
-        .tf-btn.selected-false {
-            background: linear-gradient(135deg, #f44336, #e53935);
-            color: white;
-            border-color: #f44336;
-            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.3);
-        }
-        
-        .tf-btn.correct {
-            background: linear-gradient(135deg, #4caf50, #45a049) !important;
-            color: white !important;
-            border-color: #4caf50 !important;
-            animation: pulse 0.5s ease-in-out;
-            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.4) !important;
-        }
-        
-        .tf-btn.incorrect {
-            background: linear-gradient(135deg, #f44336, #e53935) !important;
-            color: white !important;
-            border-color: #f44336 !important;
-            animation: shake 0.5s ease-in-out;
-            box-shadow: 0 5px 15px rgba(244, 67, 54, 0.4) !important;
-        }
-        
-        .tf-btn.disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        
-        .short-answer-container {
-            background: linear-gradient(135deg, #f8f9ff, #ffffff);
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-        }
-        
-        .short-answer-inputs {
-            display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 15px;
-            margin-bottom: 20px;
-        }
-        
-        .answer-input {
-            padding: 20px;
-            border: 3px solid #ddd;
-            border-radius: 12px;
-            font-size: 1.5em;
-            text-align: center;
-            transition: all 0.3s;
-            background: white;
-            font-weight: bold;
-            color: #333;
-        }
-        
-        .answer-input:focus {
-            outline: none;
-            border-color: #667eea;
-            box-shadow: 0 0 20px rgba(102, 126, 234, 0.3);
-            transform: scale(1.05);
-            background: #f8f9ff;
-        }
-        
-        .answer-input.correct {
-            border-color: #4caf50 !important;
-            background: linear-gradient(135deg, #e8f5e9, #c8e6c9) !important;
-            color: #2e7d32 !important;
-            animation: pulse 0.5s ease-in-out;
-        }
-        
-        .answer-input.incorrect {
-            border-color: #f44336 !important;
-            background: linear-gradient(135deg, #ffebee, #ffcdd2) !important;
-            color: #c62828 !important;
-            animation: shake 0.5s ease-in-out;
-        }
-        
-        .answer-input.disabled {
-            cursor: not-allowed;
-            opacity: 0.7;
-        }
-        
-        .short-answer-hint {
-            text-align: center;
-            color: #666;
-            font-size: 0.95em;
-            margin-top: 15px;
-            font-style: italic;
-        }
-        
-        .short-answer-unit {
-            text-align: center;
-            margin-top: 15px;
-            padding: 12px;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            border-radius: 10px;
-            font-weight: bold;
-            font-size: 1.1em;
-            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
-        }
-        
-        .correct-answer-display {
-            margin-top: 20px;
-            padding: 15px;
-            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-            border: 3px solid #4caf50;
-            border-radius: 12px;
-            text-align: center;
-            font-weight: bold;
-            color: #2e7d32;
-            font-size: 1.1em;
-        }
-        
-        .controls {
-            display: flex;
-            gap: 15px;
-            margin-top: 30px;
-            flex-wrap: wrap;
-        }
-        
-        .btn {
-            padding: 16px 32px;
-            border: none;
-            border-radius: 12px;
-            cursor: pointer;
-            font-size: 1.1em;
-            font-weight: bold;
-            transition: all 0.3s;
-            flex: 1;
-            min-width: 150px;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .btn::before {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            width: 0;
-            height: 0;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-            transform: translate(-50%, -50%);
-            transition: width 0.6s, height 0.6s;
-        }
-        
-        .btn:hover::before {
-            width: 300px;
-            height: 300px;
-        }
-        
-        .btn > * {
-            position: relative;
-            z-index: 1;
-        }
-        
-        .btn-primary {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            box-shadow: 0 5px 20px rgba(102, 126, 234, 0.4);
-        }
-        
-        .btn-primary:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 30px rgba(102, 126, 234, 0.6);
-        }
-        
-        .btn-secondary {
-            background: linear-gradient(135deg, #f093fb, #f5576c);
-            color: white;
-            box-shadow: 0 5px 20px rgba(240, 147, 251, 0.4);
-        }
-        
-        .btn-secondary:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 30px rgba(240, 147, 251, 0.6);
-        }
-        
-        .btn-success {
-            background: linear-gradient(135deg, #4caf50, #45a049);
-            color: white;
-            box-shadow: 0 5px 20px rgba(76, 175, 80, 0.4);
-            animation: pulse 2s ease-in-out infinite;
-        }
-        
-        .btn-success:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 30px rgba(76, 175, 80, 0.6);
-            animation: none;
-        }
-        
-        .btn:disabled {
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none !important;
-        }
-        
-        .btn:disabled:hover {
-            box-shadow: none;
-        }
-        
-        .progress {
-            background: rgba(255, 255, 255, 0.3);
-            height: 12px;
-            border-radius: 20px;
-            overflow: hidden;
-            margin-bottom: 30px;
-            box-shadow: inset 0 2px 5px rgba(0,0,0,0.1);
-        }
-        
-        .progress-bar {
-            background: linear-gradient(90deg, #667eea, #764ba2, #f093fb);
-            height: 100%;
-            transition: width 0.5s ease;
-            box-shadow: 0 2px 10px rgba(102, 126, 234, 0.5);
-            position: relative;
-        }
-        
-        .progress-bar::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
-            animation: shimmer 2s infinite;
-        }
-        
-        @keyframes shimmer {
-            0% { transform: translateX(-100%); }
-            100% { transform: translateX(100%); }
-        }
-        
-        .score-card {
-            background: linear-gradient(135deg, #ffffff 0%, #f8f9ff 100%);
-            padding: 50px;
-            border-radius: 25px;
-            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
-            text-align: center;
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .score-card::before {
-            content: '🎉';
-            position: absolute;
-            font-size: 15em;
-            opacity: 0.05;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-        }
-        
-        .score-card > * {
-            position: relative;
-            z-index: 1;
-        }
-        
-        .score-card h2 {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 2.8em;
-            margin-bottom: 25px;
-            font-weight: 800;
-            animation: bounce 1s ease-in-out;
-        }
-        
-        .score-display {
-            font-size: 5em;
-            font-weight: 900;
-            background: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            margin: 30px 0;
-            animation: pulse 2s ease-in-out infinite;
-        }
-        
-        .score-details {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 25px;
-            margin: 40px 0;
-        }
-        
-        .score-item {
-            background: linear-gradient(135deg, #f8f9ff, #ffffff);
-            padding: 25px;
-            border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
-            transition: all 0.3s;
-        }
-        
-        .score-item:hover {
-            transform: translateY(-5px) scale(1.05);
-            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
-        }
-        
-        .score-item .label {
-            color: #666;
-            font-size: 1em;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        
-        .score-item .value {
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            font-size: 2.2em;
-            font-weight: 900;
-        }
-        
-        .feedback {
-            margin-top: 30px;
-            padding: 25px;
-            border-radius: 15px;
-            font-size: 1.3em;
-            font-weight: 700;
-            animation: bounce 0.5s ease-in-out;
-        }
-        
-        .feedback.excellent {
-            background: linear-gradient(135deg, #e8f5e9, #c8e6c9);
-            color: #2e7d32;
-            border: 3px solid #4caf50;
-            box-shadow: 0 10px 30px rgba(76, 175, 80, 0.3);
-        }
-        
-        .feedback.good {
-            background: linear-gradient(135deg, #e3f2fd, #bbdefb);
-            color: #1565c0;
-            border: 3px solid #2196f3;
-            box-shadow: 0 10px 30px rgba(33, 150, 243, 0.3);
-        }
-        
-        .feedback.average {
-            background: linear-gradient(135deg, #fff3e0, #ffe0b2);
-            color: #e65100;
-            border: 3px solid #ff9800;
-            box-shadow: 0 10px 30px rgba(255, 152, 0, 0.3);
-        }
-        
-        .feedback.needs-improvement {
-            background: linear-gradient(135deg, #ffebee, #ffcdd2);
-            color: #c62828;
-            border: 3px solid #f44336;
-            box-shadow: 0 10px 30px rgba(244, 67, 54, 0.3);
-        }
-        
-        @media (max-width: 600px) {
-            .header h1 {
-                font-size: 1.5em;
-            }
-            
-            .mode-buttons {
-                grid-template-columns: 1fr;
-            }
-            
-            .controls {
-                flex-direction: column;
-            }
-            
-            .btn {
-                min-width: 100%;
-            }
-        }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Quiz Vật Lý 10 – Giữa HKII</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Be+Vietnam+Pro:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0d1117;
+    --surface: #161b22;
+    --surface2: #1c2330;
+    --border: #30363d;
+    --gold: #e6ac2c;
+    --gold2: #f5c842;
+    --red: #f85149;
+    --green: #3fb950;
+    --blue: #58a6ff;
+    --text: #e6edf3;
+    --muted: #8b949e;
+    --radius: 12px;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Be Vietnam Pro', sans-serif;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(230,172,44,0.25) 0%, transparent 100%),
+      radial-gradient(1px 1px at 80% 10%, rgba(88,166,255,0.15) 0%, transparent 100%),
+      radial-gradient(1px 1px at 50% 70%, rgba(230,172,44,0.1) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 90%, rgba(88,166,255,0.1) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .screen { display: none; width: 100%; max-width: 820px; padding: 24px 16px 60px; position: relative; z-index: 1; }
+  .screen.active { display: block; }
+
+  #start-screen { text-align: center; padding-top: 60px; }
+
+  .logo-badge {
+    display: inline-flex; align-items: center; gap: 8px;
+    background: rgba(230,172,44,0.12); border: 1px solid rgba(230,172,44,0.3);
+    border-radius: 999px; padding: 6px 16px;
+    font-size: 0.75rem; font-weight: 700; letter-spacing: 0.12em;
+    color: var(--gold); text-transform: uppercase; margin-bottom: 28px;
+  }
+
+  h1.main-title {
+    font-family: 'Playfair Display', serif;
+    font-size: clamp(2rem, 5vw, 3.2rem);
+    font-weight: 900; line-height: 1.15;
+    background: linear-gradient(135deg, #e6ac2c 0%, #f5c842 50%, #e6ac2c 100%);
+    -webkit-background-clip: text; -webkit-text-fill-color: transparent;
+    background-clip: text; margin-bottom: 12px;
+  }
+
+  .subtitle { color: var(--muted); font-size: 1rem; margin-bottom: 36px; }
+
+  .stats-row {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;
+    margin-bottom: 40px;
+  }
+
+  .stat-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px 24px; text-align: center;
+    min-width: 120px;
+  }
+  .stat-card .num { font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 700; color: var(--gold); }
+  .stat-card .lbl { font-size: 0.75rem; color: var(--muted); margin-top: 2px; }
+
+  .mode-list {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+    gap: 12px; margin-bottom: 40px;
+  }
+
+  .mode-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 16px; text-align: left;
+    cursor: pointer; transition: all 0.2s;
+    position: relative; overflow: hidden;
+  }
+  .mode-card::before {
+    content: ''; position: absolute; left: 0; top: 0; bottom: 0;
+    width: 3px; background: var(--gold); opacity: 0;
+    transition: opacity 0.2s;
+  }
+  .mode-card:hover, .mode-card.selected {
+    border-color: var(--gold); background: rgba(230,172,44,0.07);
+  }
+  .mode-card:hover::before, .mode-card.selected::before { opacity: 1; }
+  .mode-card.selected { box-shadow: 0 0 0 1px var(--gold); }
+
+  .mode-card .mode-num { font-size: 0.7rem; color: var(--gold); font-weight: 700; letter-spacing: 0.1em; text-transform: uppercase; }
+  .mode-card .mode-name { font-size: 0.88rem; font-weight: 600; margin-top: 4px; line-height: 1.3; }
+  .mode-card .mode-count { font-size: 0.75rem; color: var(--muted); margin-top: 6px; }
+
+  .btn-start {
+    background: linear-gradient(135deg, #e6ac2c, #f5c842);
+    color: #0d1117; border: none; border-radius: var(--radius);
+    padding: 16px 48px; font-size: 1.05rem; font-weight: 700;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    cursor: pointer; transition: all 0.2s; letter-spacing: 0.03em;
+  }
+  .btn-start:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(230,172,44,0.35); }
+  .btn-start:active { transform: translateY(0); }
+
+  #quiz-screen { padding-top: 20px; }
+
+  .quiz-header {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 20px; gap: 12px; flex-wrap: wrap;
+  }
+
+  .mode-badge {
+    background: rgba(230,172,44,0.12); border: 1px solid rgba(230,172,44,0.25);
+    border-radius: 999px; padding: 5px 14px;
+    font-size: 0.72rem; font-weight: 700; color: var(--gold);
+    letter-spacing: 0.08em; text-transform: uppercase;
+  }
+
+  .q-counter { font-size: 0.85rem; color: var(--muted); font-weight: 600; }
+  .q-counter span { color: var(--text); font-weight: 700; }
+
+  .progress-bar-wrap {
+    width: 100%; height: 6px; background: var(--border);
+    border-radius: 999px; margin-bottom: 28px; overflow: hidden;
+  }
+  .progress-bar-fill {
+    height: 100%; background: linear-gradient(90deg, #e6ac2c, #f5c842);
+    border-radius: 999px; transition: width 0.4s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  .segment-progress {
+    display: flex; gap: 3px; margin-bottom: 22px; flex-wrap: wrap;
+  }
+  .seg-dot {
+    flex: 1; min-width: 6px; max-width: 16px; height: 6px;
+    border-radius: 999px; background: var(--border);
+    transition: background 0.3s;
+  }
+  .seg-dot.correct { background: var(--green); }
+  .seg-dot.wrong { background: var(--red); }
+  .seg-dot.current { background: var(--gold); }
+
+  .question-card {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 16px; padding: 28px; margin-bottom: 16px;
+    animation: slideIn 0.3s cubic-bezier(0.4,0,0.2,1);
+  }
+
+  @keyframes slideIn {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  .q-text {
+    font-size: 1.05rem; font-weight: 600; line-height: 1.6;
+    margin-bottom: 20px;
+  }
+
+  .question-image {
+    width: 100%;
+    max-width: 500px;
+    margin: 20px auto;
+    display: block;
+    border-radius: 12px;
+    border: 1px solid var(--border);
+  }
+
+  .options { display: flex; flex-direction: column; gap: 10px; }
+
+  .option-btn {
+    background: var(--surface2); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 18px;
+    text-align: left; cursor: pointer; transition: all 0.18s;
+    font-size: 0.92rem; font-family: 'Be Vietnam Pro', sans-serif;
+    color: var(--text); font-weight: 500; line-height: 1.5;
+    display: flex; align-items: flex-start; gap: 12px;
+  }
+  .option-btn:hover:not(:disabled) {
+    border-color: var(--gold); background: rgba(230,172,44,0.08);
+    transform: translateX(3px);
+  }
+  .option-btn .opt-label {
+    width: 24px; height: 24px; border-radius: 50%;
+    background: var(--border); display: flex; align-items: center; justify-content: center;
+    font-size: 0.75rem; font-weight: 700; flex-shrink: 0; margin-top: 1px;
+    transition: all 0.18s;
+  }
+  .option-btn:hover:not(:disabled) .opt-label { background: var(--gold); color: #0d1117; }
+
+  .option-btn.selected { border-color: var(--gold); background: rgba(230,172,44,0.08); }
+  .option-btn.selected .opt-label { background: var(--gold); color: #0d1117; }
+
+  .option-btn.correct {
+    border-color: var(--green); background: rgba(63,185,80,0.1);
+    pointer-events: none;
+  }
+  .option-btn.correct .opt-label { background: var(--green); color: #0d1117; }
+
+  .option-btn.wrong {
+    border-color: var(--red); background: rgba(248,81,73,0.1);
+    pointer-events: none;
+  }
+  .option-btn.wrong .opt-label { background: var(--red); color: #fff; }
+
+  .option-btn.disabled-plain { opacity: 0.5; pointer-events: none; }
+
+  .tf-statement {
+    background: var(--surface2);
+    padding: 14px;
+    border-radius: var(--radius);
+    margin-bottom: 8px;
+    font-weight: 500;
+    border-left: 3px solid var(--border);
+    font-size: 0.9rem;
+    line-height: 1.5;
+  }
+
+  .tf-buttons {
+    display: flex;
+    gap: 8px;
+    margin-top: 8px;
+  }
+
+  .tf-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 600;
+    font-size: 0.85rem;
+    background: var(--surface2);
+    color: var(--text);
+  }
+
+  .tf-btn:hover:not(.disabled) {
+    border-color: var(--gold);
+    background: rgba(230,172,44,0.08);
+  }
+
+  .tf-btn.selected-true {
+    background: rgba(63,185,80,0.15);
+    border-color: var(--green);
+    color: var(--green);
+  }
+
+  .tf-btn.selected-false {
+    background: rgba(248,81,73,0.15);
+    border-color: var(--red);
+    color: var(--red);
+  }
+
+  .tf-btn.correct {
+    background: rgba(63,185,80,0.2) !important;
+    border-color: var(--green) !important;
+    color: var(--green) !important;
+  }
+
+  .tf-btn.wrong {
+    background: rgba(248,81,73,0.2) !important;
+    border-color: var(--red) !important;
+    color: var(--red) !important;
+  }
+
+  .tf-btn.disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+  }
+
+  .short-answer-container {
+    background: var(--surface2);
+    padding: 20px;
+    border-radius: var(--radius);
+  }
+
+  .short-answer-inputs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+    justify-content: center;
+    flex-wrap: wrap;
+  }
+
+  .answer-input {
+    width: 50px;
+    height: 50px;
+    padding: 12px;
+    border: 2px solid var(--border);
+    border-radius: 8px;
+    font-size: 1.3rem;
+    text-align: center;
+    transition: all 0.2s;
+    background: var(--surface);
+    font-weight: 700;
+    color: var(--text);
+    font-family: 'Be Vietnam Pro', sans-serif;
+  }
+
+  .answer-input:focus {
+    outline: none;
+    border-color: var(--gold);
+    background: rgba(230,172,44,0.08);
+  }
+
+  .answer-input.correct {
+    border-color: var(--green) !important;
+    background: rgba(63,185,80,0.15) !important;
+    color: var(--green) !important;
+  }
+
+  .answer-input.incorrect {
+    border-color: var(--red) !important;
+    background: rgba(248,81,73,0.15) !important;
+    color: var(--red) !important;
+  }
+
+  .answer-input.disabled {
+    cursor: not-allowed;
+    opacity: 0.7;
+  }
+
+  .short-answer-hint {
+    text-align: center;
+    color: var(--muted);
+    font-size: 0.8rem;
+    margin-top: 12px;
+    font-style: italic;
+  }
+
+  .short-answer-unit {
+    text-align: center;
+    margin-top: 12px;
+    padding: 10px;
+    background: rgba(230,172,44,0.12);
+    color: var(--gold);
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 0.9rem;
+    border: 1px solid rgba(230,172,44,0.3);
+  }
+
+  .correct-answer-display {
+    margin-top: 16px;
+    padding: 12px;
+    background: rgba(63,185,80,0.12);
+    border: 1px solid rgba(63,185,80,0.3);
+    border-radius: 8px;
+    text-align: center;
+    font-weight: 600;
+    color: var(--green);
+    font-size: 0.95rem;
+  }
+
+  .feedback-box {
+    border-radius: var(--radius); padding: 14px 18px;
+    font-size: 0.88rem; font-weight: 600; margin-bottom: 16px;
+    display: none; align-items: center; gap: 10px; line-height: 1.5;
+  }
+  .feedback-box.show { display: flex; }
+  .feedback-box.correct-fb { background: rgba(63,185,80,0.12); border: 1px solid rgba(63,185,80,0.3); color: #7ee787; }
+  .feedback-box.wrong-fb { background: rgba(248,81,73,0.12); border: 1px solid rgba(248,81,73,0.3); color: #ff7b72; }
+
+  .btn-check {
+    background: linear-gradient(135deg, #e6ac2c, #f5c842);
+    color: #0d1117; border: none; border-radius: var(--radius);
+    padding: 12px 24px; font-size: 0.9rem; font-weight: 700;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+    display: none; margin-top: 12px; width: 100%;
+  }
+  .btn-check.show { display: block; }
+  .btn-check:hover { transform: translateY(-1px); box-shadow: 0 4px 16px rgba(230,172,44,0.3); }
+
+  .btn-next {
+    background: linear-gradient(135deg, #e6ac2c, #f5c842);
+    color: #0d1117; border: none; border-radius: var(--radius);
+    padding: 14px 36px; font-size: 0.95rem; font-weight: 700;
+    font-family: 'Be Vietnam Pro', sans-serif;
+    cursor: pointer; transition: all 0.2s;
+    display: none; width: 100%;
+  }
+  .btn-next.show { display: block; }
+  .btn-next:hover { transform: translateY(-1px); box-shadow: 0 6px 20px rgba(230,172,44,0.3); }
+
+  #result-screen { text-align: center; padding-top: 40px; }
+
+  .result-ring-wrap { display: flex; justify-content: center; margin-bottom: 28px; }
+
+  .result-ring {
+    width: 160px; height: 160px; position: relative;
+  }
+  .result-ring svg { width: 100%; height: 100%; transform: rotate(-90deg); }
+  .ring-bg { fill: none; stroke: var(--border); stroke-width: 10; }
+  .ring-fill { fill: none; stroke-width: 10; stroke-linecap: round; transition: stroke-dashoffset 1.2s cubic-bezier(0.4,0,0.2,1); }
+  .ring-center {
+    position: absolute; inset: 0; display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+  }
+  .ring-pct { font-family: 'Playfair Display', serif; font-size: 2.2rem; font-weight: 900; }
+  .ring-lbl { font-size: 0.72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em; }
+
+  .result-title {
+    font-family: 'Playfair Display', serif; font-size: 2rem; font-weight: 900;
+    margin-bottom: 8px;
+  }
+  .result-sub { color: var(--muted); margin-bottom: 32px; }
+
+  .result-stats {
+    display: flex; gap: 16px; justify-content: center; flex-wrap: wrap; margin-bottom: 36px;
+  }
+  .res-stat {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 14px 20px; min-width: 100px;
+  }
+  .res-stat .rs-num { font-family: 'Playfair Display', serif; font-size: 1.8rem; font-weight: 700; }
+  .res-stat .rs-lbl { font-size: 0.72rem; color: var(--muted); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; margin-top: 2px; }
+  .res-stat.green .rs-num { color: var(--green); }
+  .res-stat.red .rs-num { color: var(--red); }
+  .res-stat.gold .rs-num { color: var(--gold); }
+
+  .result-btns { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
+
+  .btn-restart, .btn-back {
+    border-radius: var(--radius); padding: 13px 28px;
+    font-size: 0.92rem; font-weight: 700; cursor: pointer;
+    font-family: 'Be Vietnam Pro', sans-serif; transition: all 0.2s;
+    border: none;
+  }
+  .btn-restart {
+    background: linear-gradient(135deg, #e6ac2c, #f5c842); color: #0d1117;
+  }
+  .btn-restart:hover { transform: translateY(-2px); box-shadow: 0 6px 20px rgba(230,172,44,0.3); }
+  .btn-back {
+    background: var(--surface2); color: var(--text);
+    border: 1px solid var(--border);
+  }
+  .btn-back:hover { border-color: var(--gold); color: var(--gold); }
+
+  .review-section { margin-top: 40px; text-align: left; }
+  .review-title {
+    font-family: 'Playfair Display', serif; font-size: 1.3rem; font-weight: 700;
+    margin-bottom: 16px; color: var(--gold);
+  }
+  .review-item {
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; margin-bottom: 12px;
+  }
+  .review-item .ri-q { font-size: 0.88rem; font-weight: 600; margin-bottom: 8px; line-height: 1.5; }
+  .review-item .ri-row { font-size: 0.82rem; margin-top: 4px; line-height: 1.5; }
+  .ri-wrong-ans { color: var(--red); }
+  .ri-right-ans { color: var(--green); }
+
+  @media (max-width: 600px) {
+    .answer-input {
+      width: 45px;
+      height: 45px;
+      font-size: 1.1rem;
+    }
+  }
+</style>
 </head>
 <body>
-    <div id="root"></div>
 
-    <script type="text/babel">
-        const { useState, useEffect } = React;
+<div class="screen active" id="start-screen">
+  <div class="logo-badge">⚛️ Ôn tập giữa HKII</div>
+  <h1 class="main-title">Quiz Vật Lý 10</h1>
+  <p class="subtitle">Mô men lực • Công & Năng lượng • Cơ năng</p>
 
-        // Dữ liệu câu hỏi
-        const questionsData = {
-            tracNghiem: [
-                {
-                    id: 1,
-                    question: "Chọn mệnh đề đúng. Mô men lực là",
-                    options: [
-                        "đại lượng đặc trưng cho tác dụng làm quay của lực.",
-                        "đại lượng cho đặc trưng độ biến đổi nhanh hay chậm của vận tốc",
-                        "đại lượng đặc trưng cho độ nhanh hay chậm của chuyển động.",
-                        "đại lượng cho đặc trưng độ nhanh hay chậm của lực."
-                    ],
-                    correct: 0
-                },
-                {
-                    id: 2,
-                    question: "Đơn vị momen của lực trong hệ SI là",
-                    options: ["N.m", "N.m²", "N.m/s", "N/m"],
-                    correct: 0
-                },
-                {
-                    id: 3,
-                    question: "Một lực không đổi có độ lớn F, tác dụng lên một vật rắn làm nó có thể quay quanh trục. Cánh tay đòn của lực là d. Mô men của lực là M tính theo công thức đúng là",
-                    options: ["M = F.d", "M = F/d", "M = F.d²", "M = F + d"],
-                    correct: 0
-                },
-                {
-                    id: 4,
-                    question: "Dụng cụ nào sau đây không cần dùng trong bài thực hành Tổng hợp lực hai đồng quy?",
-                    options: ["Lực kế", "Dây chỉ bền", "Thước đo góc", "Đồng hồ đo thời gian"],
-                    correct: 3
-                },
-                {
-                    id: 5,
-                    question: "Hai lực F₁ và F₂ tác dụng đồng thời vào vật rắn. Khi hai lực này cùng chiều, thì hợp lực của chúng là F tính theo công thức đúng là",
-                    options: ["F = F₁ + F₂", "F = F₁ - F₂", "F = √(F₁² + F₂²)", "F = F₁ × F₂"],
-                    correct: 0
-                },
-                {
-                    id: 6,
-                    question: "Bộ dụng cụ và phương án bố trí thí nghiệm như hình dưới được sử dụng trong thí nghiệm nào sau đây?",
-                    image: "assets/hinh-trac-nghiem-cau-6.png",
-                    options: [
-                        "Thí nghiệm tổng hợp hai lực đồng quy",
-                        "Thí nghiệm khảo sát lực đàn hồi của lò xo lực kế",
-                        "Thí nghiệm minh họa định luật 2 Newton",
-                        "Thí nghiệm tổng hợp hai lực song song"
-                    ],
-                    correct: 0
-                },
-                {
-                    id: 7,
-                    question: "Dưới tác dụng vec-tơ lực F hợp với phương chuyển động một góc α làm vật di chuyển quãng đường s. Biểu thức tính công của lực là",
-                    options: ["A = F.s.cos α", "A = F.cos α", "A = s.cos α", "A = F.s.sin α"],
-                    correct: 0
-                },
-                {
-                    id: 8,
-                    question: "Lực F không đổi tác dụng lên một vật làm vật chuyển dời đoạn s theo hướng hợp với hướng của lực một góc α, biểu thức tính công của lực là:",
-                    options: ["A = F.s.cos α", "A = F.s", "A = F.s.sin α", "A = F.s + cos α"],
-                    correct: 0
-                },
-                {
-                    id: 9,
-                    question: "Đơn vị nào sau đây là đơn vị của công?",
-                    options: ["kW", "N/m", "J", "W"],
-                    correct: 2
-                },
-                {
-                    id: 10,
-                    question: "Đơn vị công của lực là",
-                    options: ["J (Jun)", "W (oát)", "N (Niuton)", "m (mét)"],
-                    correct: 0
-                },
-                {
-                    id: 11,
-                    question: "Phát biểu nào sau đây là sai khi nói về năng lượng?",
-                    options: [
-                        "Năng lượng là một đại lượng vô hướng",
-                        "Năng lượng có thể chuyển hóa từ dạng này sang dạng khác",
-                        "Năng lượng luôn là một đại lượng bảo toàn",
-                        "Trong hệ SI, đơn vị của năng lượng là calories (calo)"
-                    ],
-                    correct: 3
-                },
-                {
-                    id: 12,
-                    question: "Đại lượng đặc trưng cho khả năng thực hiện công nhanh hay chậm trong một đơn vị thời gian gọi là",
-                    options: ["công suất", "năng lượng", "công cơ học", "động năng"],
-                    correct: 0
-                },
-                {
-                    id: 13,
-                    question: "Đại lượng đặc trưng cho khả năng thực hiện công nhanh hay chậm trong một đơn vị thời gian gọi là",
-                    options: ["công suất", "năng lượng", "công cơ học", "động năng"],
-                    correct: 0
-                },
-                {
-                    id: 14,
-                    question: "Đơn vị của công suất là",
-                    options: ["W", "J.m", "kg.m/s", "J.s"],
-                    correct: 0
-                },
-                {
-                    id: 15,
-                    question: "Công suất được xác định bằng:",
-                    options: [
-                        "tích của công và thời gian thực hiện công",
-                        "công thực hiện trong một đơn vị thời gian",
-                        "công thực hiện được trên một đơn vị chiều dài",
-                        "giá trị công thực hiện được"
-                    ],
-                    correct: 1
-                },
-                {
-                    id: 16,
-                    question: "Công suất của lực F làm vật di chuyển với vận tốc v theo hướng của F là",
-                    options: ["P = Fv²", "P = Fv", "P = Fvt", "P = Ft"],
-                    correct: 1
-                },
-                {
-                    id: 17,
-                    question: "Một lực không đổi là F, tác dụng lên vật chuyển động với tốc độ v cùng chiều lực. Công suất tức thời là",
-                    options: ["P = F.v", "P = F/v", "P = F + v", "P = F - v"],
-                    correct: 0
-                },
-                {
-                    id: 18,
-                    question: "Một máy thực hiện công A trong thời gian t. Công suất trung bình của máy là P tính theo công thức",
-                    options: ["P = A/t", "P = A.t", "P = A + t", "P = t/A"],
-                    correct: 0
-                },
-                {
-                    id: 19,
-                    question: "Một vật trọng lượng 50 N được kéo thẳng đều từ mặt đất lên độ cao 10 m trong khoảng thời gian 1 phút 40 giây. Xác định công suất của lực kéo.",
-                    options: ["1 W", "0,5 W", "5 W", "10 W"],
-                    correct: 2
-                },
-                {
-                    id: 20,
-                    question: "Cơ năng của một vật là",
-                    options: [
-                        "tổng động lượng và thế năng",
-                        "tổng động năng và nội năng",
-                        "tổng động năng và động lượng",
-                        "tổng động năng và thế năng của nó"
-                    ],
-                    correct: 3
-                },
-                {
-                    id: 21,
-                    question: "Khi một vật chuyển động trong trọng trường thì cơ năng của vật được xác định theo công thức:",
-                    options: [
-                        "W = (1/2)mv² + mgh",
-                        "W = (1/2)mv + mgh",
-                        "W = (1/2)mv² + (1/2)mgh",
-                        "W = (1/2)mv + (1/2)mgh"
-                    ],
-                    correct: 0
-                },
-                {
-                    id: 22,
-                    question: "Khi nói về định luật bảo toàn cơ năng, phát biểu đúng là",
-                    options: [
-                        "Chỉ có trọng lực tác dụng thì cơ năng của vật luôn không thay đổi",
-                        "Cơ năng một người nhảy dù bảo toàn",
-                        "Khi một vật được thả rơi tự do, cơ năng không bảo toàn",
-                        "Khi cơ năng bảo toàn, nếu động năng tăng thì thế năng trọng trường cũng tăng"
-                    ],
-                    correct: 0
-                },
-                {
-                    id: 23,
-                    question: "Lúc đầu vật có động năng là W₁. Do lực thực hiện công A nên lúc sau vật đó có động năng là W₂. Công thức liên hệ độ biến thiên động năng và công là",
-                    options: ["A = W₂ - W₁", "A = W₁ - W₂", "A = W₁ + W₂", "A = W₁.W₂"],
-                    correct: 0
-                },
-                {
-                    id: 24,
-                    question: "Một chất điểm có khối lượng m chuyển động với vận tốc v thì động năng của nó bằng",
-                    options: ["2mv²", "mv²", "(1/2)mv²", "mv"],
-                    correct: 2
-                },
-                {
-                    id: 25,
-                    question: "Một vật có khối lượng m, ở nơi có độ cao h so với mốc thế năng và gia tốc rơi tự do là g thì vật có thế năng Wt tính theo công thức là",
-                    options: ["Wt = mgh", "Wt = mgh²", "Wt = m²gh", "Wt = (1/2)mgh"],
-                    correct: 0
-                },
-                {
-                    id: 26,
-                    question: "Thế năng trọng trường là đại lượng",
-                    options: [
-                        "vô hướng, có thể dương hoặc bằng không",
-                        "vô hướng, có thể âm, dương hoặc bằng không",
-                        "véc tơ cùng hướng với véc tơ trọng lực",
-                        "véc tơ có độ lớn luôn dương hoặc bằng không"
-                    ],
-                    correct: 1
-                },
-                {
-                    id: 27,
-                    question: "Khi con lắc đơn dao động đến vị trí cao nhất",
-                    options: [
-                        "động năng đạt giá trị cực đại",
-                        "cơ năng bằng không",
-                        "thế năng đạt giá trị cực đại",
-                        "thế năng bằng động năng"
-                    ],
-                    correct: 2
-                },
-                {
-                    id: 28,
-                    question: "Một chất điểm có khối lượng m chuyển động với vận tốc v thì động năng của nó bằng",
-                    options: ["mv", "2mv²", "mv²", "(1/2)mv²"],
-                    correct: 3
-                },
-                {
-                    id: 29,
-                    question: "Khi hạt mưa rơi, thế năng của nó chuyển hoá thành",
-                    options: ["nhiệt năng", "động năng", "hoá năng", "quang năng"],
-                    correct: 1
-                },
-                {
-                    id: 30,
-                    question: "Hiệu suất là tỉ số giữa",
-                    options: [
-                        "năng lượng hao phí và năng lượng có ích",
-                        "năng lượng có ích và năng lượng hao phí",
-                        "năng lượng có ích và năng lượng toàn phần",
-                        "năng lượng hao phí và năng lượng toàn phần"
-                    ],
-                    correct: 2
-                }
-            ],
-            dungSai: [
-                {
-                    id: 1,
-                    question: "Một lực có độ lớn F=10 N, tác dụng lên vật làm nó chuyển động thẳng đều và đi được quãng đường s = 2 m trong thời gian 4 giây. Biết lực F cùng chiều chuyển động",
-                    statements: [
-                        "Công của lực F tính theo công thức là A=F.s.",
-                        "Tính công của lực: A=F.s = 10.2=20 J.",
-                        "Góc giữa lực và chiều chuyển động bằng 0.",
-                        "Công của lực F tính theo công thức là A=F.s.sin(α) với α=0"
-                    ],
-                    correct: [true, true, true, false]
-                },
-                {
-                    id: 2,
-                    question: "Một máy bay có khối lượng m, đang bay với vận tốc v tại độ cao h so với mặt đất. lấy g = 10 m/s². Chọn mặt đất làm mốc tính độ cao",
-                    statements: [
-                        "Thế năng của máy bay là Wt=mgh.",
-                        "Động năng máy bay là Wđ=mv/2.",
-                        "Cơ năng máy bay luôn không đổi.",
-                        "Khi máy bay giảm tốc độ để hạ cánh, động năng giảm dần."
-                    ],
-                    correct: [true, false, false, true]
-                },
-                {
-                    id: 3,
-                    question: "Một vật có khối lượng m = 4 kg đang nằm yên trên mặt sàn nằm ngang. Kéo vật trượt bằng lực có độ lớn 30N và hợp với mặt sàn góc 60°. Hệ số ma sát giữa vật và mặt sàn là 0,4. Khi vật trượt được đoạn đường 0,5m. Lấy g = 10 m/s²",
-                    image: "assets/hinh-dung-sai-cau-3.png",
-                    statements: [
-                        "Công của lực kéo trong trường hợp này là công phát động",
-                        "Công là đại lượng vô hướng và luôn dương",
-                        "Công của lực ma sát bằng 20 J",
-                        "Công mà lực kéo thực hiện có giá trị bằng 7,5 N"
-                    ],
-                    correct: [true, false, false, false]
-                },
-                {
-                    id: 4,
-                    question: "Một động cơ có công suất tiêu thụ bằng 5 kW kéo một vật có trọng lượng 12 kN lên cao 30 m theo phương thẳng đứng trong thời gian 90 s với vận tốc không đổi.",
-                    statements: [
-                        "Công có ích là công để đưa vật lên cao.",
-                        "Công có ích để đưa vật lên cao có giá trị là 36000 J.",
-                        "Công toàn phần để đưa vật lên cao là 450000 J.",
-                        "Hiệu suất của động cơ là 80%."
-                    ],
-                    correct: [true, false, true, true]
-                },
-                {
-                    id: 5,
-                    question: "Một vật có khối lượng 0,5 kg được thả rơi từ độ cao 25 m. Bỏ qua mọi ma sát và lấy g = 10 m/s².",
-                    statements: [
-                        "Chuyển động của vật là chuyển động rơi tự do.",
-                        "Thế năng cực đại của vật bằng cơ năng và bằng 125 J.",
-                        "Khi chạm đất thì động năng của vật đạt cực đại.",
-                        "Độ cao của vật khi nó có động năng bằng thế năng cách mặt đất 115 m."
-                    ],
-                    correct: [true, true, true, false]
-                },
-                {
-                    id: 6,
-                    question: "Một em bé nặng 20 kg chơi cầu trượt từ trạng thái đứng yên ở đỉnh cầu trượt dài 4m, nghiêng góc 30° so với phương nằm ngang. Khi đến chân cầu trượt, tốc độ của em bé này là 2 m/s. Lấy g=10 m/s². Gốc thế năng chọn tại chân dốc.",
-                    image: "assets/hinh-dung-sai-cau-6.png",
-                    statements: [
-                        "Trong quá trình chuyển động của em bé cơ năng bảo toàn.",
-                        "Động năng của em bé tăng trong quá trình trượt.",
-                        "Cơ năng của em bé ở đỉnh cầu trượt là 400 J.",
-                        "Hiệu suất của quá trình biến đổi thế năng thành động năng ở chân dốc 10%."
-                    ],
-                    correct: [false, true, true, true]
-                },
-                {
-                    id: 7,
-                    question: "Trong các động tác nâng tạ từ vị trí (1) sang vị trí (2), từ vị trí (2) sang vị trí (3), từ vị trí (3) sang vị trí (4):",
-                    image: "assets/hinh-dung-sai-cau-7.png",
-                    statements: [
-                        "Từ vị trí (1) sang vị trí (2) đã có sự chuyển hoá từ động năng sang thế năng.",
-                        "Từ vị trí (2) sang vị trí (3) đã có sự chuyển hoá từ thế năng sang động năng.",
-                        "Động tác đứng lên từ vị trí (3) sang vị trí (4) là quá trình thực hiện công.",
-                        "Trong các động tác nâng tạ đã có sự truyền năng lượng từ năng lượng hóa học do con người nạp từ thức ăn sang đòn tạ và có sự chuyển hóa năng lượng từ hóa năng thành động năng của quả tạ thành thế năng quả tạ."
-                    ],
-                    correct: [false, false, true, true]
-                },
-                {
-                    id: 8,
-                    question: "Một cô gái đang chơi ván trượt, khi qua các vị trí (1), (2), (3), (4), (5) như hình vẽ. Bỏ qua mọi ma sát.",
-                    image: "assets/hinh-dung-sai-cau-8.png",
-                    statements: [
-                        "Động năng cực đại khi qua vị trí (3).",
-                        "Thế năng lớn nhất khi qua vị trí (1).",
-                        "Khi đi từ vị trí (1) sang vị trí (3) thì cơ năng tăng.",
-                        "Từ vị trí số (1), cô gái không thể tự trượt tới vị trí số (5)."
-                    ],
-                    correct: [false, true, true, true]
-                }
-            ],
-            traLoiNgan: [
-                {
-                    id: 1,
-                    question: "Một lực 20 N, có cánh tay đòn 5 m, tác dụng làm quay một vật. Tính mô men của lực đối với trục quay.",
-                    correct: "100",
-                    unit: "N.m"
-                },
-                {
-                    id: 2,
-                    question: "Một vô lăng xe ô tô có dạng hình tròn bán kính 20 cm. Người lái tác dụng lực 20 N lên vô lăng ở mỗi tay. Moment ngẫu lực trong trường hợp này là bao nhiêu?",
-                    correct: "8",
-                    unit: "N.m"
-                },
-                {
-                    id: 3,
-                    question: "Một người nhấc một vật có khối lượng 1 kg lên độ cao 6 m. Lấy g = 10 m/s². Công mà người đã thực hiện là bao nhiêu?",
-                    correct: "60",
-                    unit: "J"
-                },
-                {
-                    id: 4,
-                    question: "Một máy thực hiện một công A=100J trong thời gian 50 giây. Tính công suất trung bình của máy.",
-                    correct: "2",
-                    unit: "W"
-                },
-                {
-                    id: 5,
-                    question: "Một khối đá có khối lượng 100 kg đang ở trên sườn núi cách chân núi 5 mét. Lấy g=10 m/s². Tính thế năng trọng trường của khối đá. Chọn chân núi có thế năng bằng 0.",
-                    correct: "5000",
-                    unit: "J"
-                },
-                {
-                    id: 6,
-                    question: "Một bồ câu trắng có khối lượng 300 gam, bay với tốc độ 36 km/h thì có động năng bao nhiêu?",
-                    correct: "15",
-                    unit: "J"
-                },
-                {
-                    id: 7,
-                    question: "Một vật có khối lượng 1 kg rơi tự do từ độ cao h = 50 cm xuống đất, lấy g = 10 m/s². Động năng của vật ngay trước khi chạm đất là bao nhiêu?",
-                    correct: "5",
-                    unit: "J"
-                },
-                {
-                    id: 8,
-                    question: "Một vật khối lượng 200 gam được thả rơi tự do từ vị trí có thế năng bằng 40 J, bỏ qua mọi ma sát, lấy g = 10 m/s². Tính độ cao của vật khi thế năng bằng ba lần động năng.",
-                    correct: "15",
-                    unit: "m"
-                },
-                {
-                    id: 9,
-                    question: "Một vật khối lượng 2 kg rơi tự do từ độ cao 10 m so với mặt đất. Bỏ qua sức cản không khí, lấy g = 9,8 m/s². Sau khoảng thời gian 1,2 s trọng lực đã thực hiện một công bằng bao nhiêu? (Làm tròn đến hàng đơn vị)",
-                    correct: "138",
-                    unit: "J"
-                },
-                {
-                    id: 10,
-                    question: "Một vật khối lượng 200 gam được thả rơi tự do từ vị trí có thế năng bằng 40 J, bỏ qua mọi ma sát, lấy g = 10 m/s². Tính độ cao của vật khi thế năng bằng ba lần động năng.",
-                    correct: "15",
-                    unit: "m"
-                },
-                {
-                    id: 11,
-                    question: "Từ mặt đất một vật được ném lên thẳng đứng với vận tốc ban đầu v₀ = 15 m/s. Bỏ qua sức cản không khí, lấy g = 10 m/s². Ở độ cao nào thế năng bằng động năng? (Làm tròn đến hàng phần mười)",
-                    correct: "5,6",
-                    unit: "m"
-                },
-                {
-                    id: 12,
-                    question: "Một người nâng tấm ván AB có khối lượng 12 kg chiều dài l bằng lực F để ván nằm yên và hợp với mặt đường một góc 30°. Xác định độ lớn của lực F khi lực F hướng vuông góc với mặt đất. Cho g = 9,8 m/s².",
-                    image: "assets/hinh-tra-loi-ngan-cau-12.png",
-                    correct: "58,8",
-                    unit: "N"
-                }
-            ]
-        };
+  <div class="stats-row">
+    <div class="stat-card"><div class="num">50</div><div class="lbl">Câu hỏi</div></div>
+    <div class="stat-card"><div class="num">4</div><div class="lbl">Chế độ</div></div>
+    <div class="stat-card"><div class="num">∞</div><div class="lbl">Thời gian</div></div>
+  </div>
 
-        function QuizApp() {
-            const [mode, setMode] = useState(null);
-            const [currentIndex, setCurrentIndex] = useState(0);
-            const [questions, setQuestions] = useState([]);
-            const [answers, setAnswers] = useState({});
-            const [submitted, setSubmitted] = useState({});
-            const [showResults, setShowResults] = useState(false);
-            const [score, setScore] = useState(0);
+  <div class="mode-list" id="mode-list">
+    <div class="mode-card" data-mode="tong-hop">
+      <div class="mode-num">Tổng hợp</div>
+      <div class="mode-name">Tất cả loại câu hỏi</div>
+      <div class="mode-count">50 câu xáo trộn</div>
+    </div>
+    <div class="mode-card" data-mode="trac-nghiem">
+      <div class="mode-num">Trắc nghiệm</div>
+      <div class="mode-name">Chọn 1 trong 4</div>
+      <div class="mode-count">30 câu</div>
+    </div>
+    <div class="mode-card" data-mode="dung-sai">
+      <div class="mode-num">Đúng - Sai</div>
+      <div class="mode-name">Đánh giá từng phương án</div>
+      <div class="mode-count">8 câu</div>
+    </div>
+    <div class="mode-card" data-mode="tra-loi-ngan">
+      <div class="mode-num">Trả lời ngắn</div>
+      <div class="mode-name">Điền số vào ô</div>
+      <div class="mode-count">12 câu</div>
+    </div>
+  </div>
 
-            const startQuiz = (selectedMode) => {
-                let quizQuestions = [];
-                
-                if (selectedMode === 'trac-nghiem') {
-                    quizQuestions = [...questionsData.tracNghiem].map(q => ({...q, type: 'tracNghiem'}));
-                } else if (selectedMode === 'dung-sai') {
-                    quizQuestions = [...questionsData.dungSai].map(q => ({...q, type: 'dungSai'}));
-                } else if (selectedMode === 'tra-loi-ngan') {
-                    quizQuestions = [...questionsData.traLoiNgan].map(q => ({...q, type: 'traLoiNgan'}));
-                } else {
-                    const all = [
-                        ...questionsData.tracNghiem.map(q => ({...q, type: 'tracNghiem'})),
-                        ...questionsData.dungSai.map(q => ({...q, type: 'dungSai'})),
-                        ...questionsData.traLoiNgan.map(q => ({...q, type: 'traLoiNgan'}))
-                    ];
-                    quizQuestions = all;
-                }
-                
-                quizQuestions = quizQuestions.sort(() => Math.random() - 0.5);
-                
-                setQuestions(quizQuestions);
-                setMode(selectedMode);
-                setCurrentIndex(0);
-                setAnswers({});
-                setSubmitted({});
-                setShowResults(false);
-                setScore(0);
-            };
+  <button class="btn-start" id="btn-start">🎯 Bắt đầu làm bài</button>
+</div>
 
-            const handleAnswer = (answer) => {
-                if (submitted[currentIndex]) return;
-                setAnswers({...answers, [currentIndex]: answer});
-            };
+<div class="screen" id="quiz-screen">
+  <div class="quiz-header">
+    <div class="mode-badge" id="cur-mode-badge">Tổng hợp</div>
+    <div class="q-counter">Câu <span id="q-cur">1</span> / <span id="q-total">50</span></div>
+  </div>
+  <div class="progress-bar-wrap">
+    <div class="progress-bar-fill" id="progress-bar"></div>
+  </div>
+  <div class="segment-progress" id="seg-progress"></div>
 
-            const submitAnswer = () => {
-                if (submitted[currentIndex]) return;
-                
-                setSubmitted({...submitted, [currentIndex]: true});
-                
-                // Tạo hiệu ứng confetti nếu đúng
-                const q = questions[currentIndex];
-                let isCorrect = false;
-                
-                if (q.type === 'tracNghiem') {
-                    isCorrect = answers[currentIndex] === q.correct;
-                } else if (q.type === 'dungSai') {
-                    isCorrect = answers[currentIndex] && JSON.stringify(answers[currentIndex]) === JSON.stringify(q.correct);
-                } else if (q.type === 'traLoiNgan') {
-                    const userAns = (answers[currentIndex] || []).join('');
-                    isCorrect = userAns === q.correct;
-                }
-                
-                if (isCorrect) {
-                    createConfetti();
-                }
-            };
+  <div class="question-card" id="question-card">
+    <div class="q-text" id="q-text"></div>
+    <div id="q-image-container"></div>
+    <div id="q-content"></div>
+  </div>
 
-            const createConfetti = () => {
-                const colors = ['#667eea', '#764ba2', '#f093fb', '#4facfe', '#4caf50', '#ffd700'];
-                for (let i = 0; i < 30; i++) {
-                    setTimeout(() => {
-                        const confetti = document.createElement('div');
-                        confetti.className = 'confetti';
-                        confetti.style.left = Math.random() * 100 + '%';
-                        confetti.style.background = colors[Math.floor(Math.random() * colors.length)];
-                        confetti.style.animationDelay = Math.random() * 0.5 + 's';
-                        document.body.appendChild(confetti);
-                        setTimeout(() => confetti.remove(), 3000);
-                    }, i * 30);
-                }
-            };
+  <div class="feedback-box" id="feedback-box"></div>
+  <button class="btn-next" id="btn-next">Câu tiếp theo →</button>
+</div>
 
-            const nextQuestion = () => {
-                if (currentIndex < questions.length - 1) {
-                    setCurrentIndex(currentIndex + 1);
-                }
-            };
+<div class="screen" id="result-screen">
+  <div class="result-ring-wrap">
+    <div class="result-ring">
+      <svg viewBox="0 0 160 160">
+        <circle class="ring-bg" cx="80" cy="80" r="65"/>
+        <circle class="ring-fill" id="ring-fill" cx="80" cy="80" r="65"/>
+      </svg>
+      <div class="ring-center">
+        <div class="ring-pct" id="ring-pct">0%</div>
+        <div class="ring-lbl">Điểm số</div>
+      </div>
+    </div>
+  </div>
 
-            const prevQuestion = () => {
-                if (currentIndex > 0) {
-                    setCurrentIndex(currentIndex - 1);
-                }
-            };
+  <div class="result-title" id="result-title">Xuất sắc!</div>
+  <div class="result-sub" id="result-sub"></div>
 
-            const calculateScore = () => {
-                let correct = 0;
-                let total = questions.length;
+  <div class="result-stats">
+    <div class="res-stat green"><div class="rs-num" id="rs-correct">0</div><div class="rs-lbl">Đúng</div></div>
+    <div class="res-stat red"><div class="rs-num" id="rs-wrong">0</div><div class="rs-lbl">Sai</div></div>
+    <div class="res-stat gold"><div class="rs-num" id="rs-total">0</div><div class="rs-lbl">Tổng câu</div></div>
+  </div>
 
-                questions.forEach((q, idx) => {
-                    const userAnswer = answers[idx];
-                    
-                    if (q.type === 'tracNghiem') {
-                        if (userAnswer === q.correct) correct++;
-                    } else if (q.type === 'dungSai') {
-                        if (userAnswer && JSON.stringify(userAnswer) === JSON.stringify(q.correct)) {
-                            correct++;
-                        }
-                    } else if (q.type === 'traLoiNgan') {
-                        const userAns = (userAnswer || []).join('');
-                        if (userAns === q.correct) {
-                            correct++;
-                        }
-                    }
-                });
+  <div class="result-btns">
+    <button class="btn-restart" id="btn-restart">🔄 Làm lại</button>
+    <button class="btn-back" id="btn-back">← Chọn chế độ khác</button>
+  </div>
 
-                setScore(Math.round((correct / total) * 100));
-                setShowResults(true);
-                createConfetti();
-            };
+  <div class="review-section" id="review-section">
+    <div class="review-title">📋 Các câu trả lời sai</div>
+    <div id="review-list"></div>
+  </div>
+</div>
 
-            const restart = () => {
-                setMode(null);
-                setCurrentIndex(0);
-                setQuestions([]);
-                setAnswers({});
-                setSubmitted({});
-                setShowResults(false);
-                setScore(0);
-            };
+<script src="quiz-data.js"></script>
+<script>
+// STATE
+let questions = [], qIdx = 0, answers = [], selectedMode = 'tong-hop';
+const LABELS = ['A','B','C','D'];
+const MODE_NAMES = {
+  'tong-hop': 'Tổng hợp',
+  'trac-nghiem': 'Trắc nghiệm',
+  'dung-sai': 'Đúng - Sai',
+  'tra-loi-ngan': 'Trả lời ngắn'
+};
 
-            const canSubmit = () => {
-                const q = questions[currentIndex];
-                const answer = answers[currentIndex];
-                
-                if (submitted[currentIndex]) return false;
-                if (!answer) return false;
-                
-                if (q.type === 'tracNghiem') {
-                    return answer !== undefined;
-                } else if (q.type === 'dungSai') {
-                    return answer && answer.length === 4;
-                } else if (q.type === 'traLoiNgan') {
-                    return answer && answer.some(val => val !== '');
-                }
-                return false;
-            };
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length-1; i>0; i--) {
+    const j = Math.floor(Math.random()*(i+1));
+    [a[i],a[j]] = [a[j],a[i]];
+  }
+  return a;
+}
 
-            const allQuestionsSubmitted = () => {
-                return Object.keys(submitted).length === questions.length;
-            };
+function normalizeNumberAnswer(str) {
+  if (str == null) return '';
+  return String(str)
+    .trim()
+    .replace(/\s+/g, '')
+    .replace(',', '.');
+}
 
-            if (!mode) {
-                return (
-                    <div className="container">
-                        <div className="header">
-                            <h1>🎓 Quiz Vật Lý Lớp 10</h1>
-                            <p>Giữa Kỳ II - Luyện Tập</p>
-                        </div>
-                        
-                        <div className="mode-selector">
-                            <h2>Chọn Chế Độ Chơi</h2>
-                            <div className="mode-buttons">
-                                <button className="mode-btn" onClick={() => startQuiz('trac-nghiem')}>
-                                    📝 Trắc Nghiệm<br/>
-                                    <small>30 câu - 4 lựa chọn</small>
-                                </button>
-                                <button className="mode-btn" onClick={() => startQuiz('dung-sai')}>
-                                    ✓✗ Đúng - Sai<br/>
-                                    <small>8 câu - 4 phương án</small>
-                                </button>
-                                <button className="mode-btn" onClick={() => startQuiz('tra-loi-ngan')}>
-                                    ✏️ Trả Lời Ngắn<br/>
-                                    <small>12 câu - Điền số</small>
-                                </button>
-                                <button className="mode-btn" onClick={() => startQuiz('tong-hop')}>
-                                    🎯 Tổng Hợp<br/>
-                                    <small>50 câu - Tất cả loại</small>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                );
-            }
+function prepareQuestions(mode) {
+  let pool = [];
+  if (mode === 'trac-nghiem') {
+    pool = [...questionsData.tracNghiem].map(q => ({...q, type: 'tracNghiem'}));
+  } else if (mode === 'dung-sai') {
+    pool = [...questionsData.dungSai].map(q => ({...q, type: 'dungSai'}));
+  } else if (mode === 'tra-loi-ngan') {
+    pool = [...questionsData.traLoiNgan].map(q => ({...q, type: 'traLoiNgan'}));
+  } else {
+    pool = [
+      ...questionsData.tracNghiem.map(q => ({...q, type: 'tracNghiem'})),
+      ...questionsData.dungSai.map(q => ({...q, type: 'dungSai'})),
+      ...questionsData.traLoiNgan.map(q => ({...q, type: 'traLoiNgan'}))
+    ];
+  }
+  return shuffle(pool);
+}
 
-            if (showResults) {
-                const percentage = score;
-                let feedback = '';
-                let feedbackClass = '';
-                
-                if (percentage >= 90) {
-                    feedback = '🏆 Xuất sắc! Bạn đã nắm vững kiến thức!';
-                    feedbackClass = 'excellent';
-                } else if (percentage >= 70) {
-                    feedback = '👍 Tốt lắm! Tiếp tục phát huy nhé!';
-                    feedbackClass = 'good';
-                } else if (percentage >= 50) {
-                    feedback = '💪 Khá đấy! Cần ôn thêm một chút nữa!';
-                    feedbackClass = 'average';
-                } else {
-                    feedback = '📚 Cần cố gắng thêm! Hãy ôn lại kiến thức nhé!';
-                    feedbackClass = 'needs-improvement';
-                }
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  window.scrollTo(0,0);
+}
 
-                const correctCount = Math.round((percentage / 100) * questions.length);
-                
-                return (
-                    <div className="container">
-                        <div className="score-card">
-                            <h2>🎉 Hoàn Thành Quiz!</h2>
-                            <div className="score-display">{percentage}%</div>
-                            
-                            <div className="score-details">
-                                <div className="score-item">
-                                    <div className="label">Tổng Câu</div>
-                                    <div className="value">{questions.length}</div>
-                                </div>
-                                <div className="score-item">
-                                    <div className="label">Đúng</div>
-                                    <div className="value">{correctCount}</div>
-                                </div>
-                                <div className="score-item">
-                                    <div className="label">Sai</div>
-                                    <div className="value">{questions.length - correctCount}</div>
-                                </div>
-                            </div>
-                            
-                            <div className={`feedback ${feedbackClass}`}>
-                                {feedback}
-                            </div>
-                            
-                            <div className="controls">
-                                <button className="btn btn-primary" onClick={restart}>
-                                    🏠 Về Trang Chủ
-                                </button>
-                                <button className="btn btn-secondary" onClick={() => {
-                                    setShowResults(false);
-                                    setCurrentIndex(0);
-                                }}>
-                                    📋 Xem Lại Đáp Án
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                );
-            }
+// START SCREEN
+document.querySelectorAll('.mode-card').forEach(card => {
+  card.addEventListener('click', () => {
+    document.querySelectorAll('.mode-card').forEach(c => c.classList.remove('selected'));
+    card.classList.add('selected');
+    selectedMode = card.dataset.mode;
+  });
+});
+document.querySelector('.mode-card').classList.add('selected');
 
-            const currentQuestion = questions[currentIndex];
-            const userAnswer = answers[currentIndex];
-            const progress = ((currentIndex + 1) / questions.length) * 100;
+document.getElementById('btn-start').addEventListener('click', startQuiz);
+document.getElementById('btn-restart').addEventListener('click', startQuiz);
+document.getElementById('btn-back').addEventListener('click', () => showScreen('start-screen'));
 
-            return (
-                <div className="container">
-                    <div className="progress">
-                        <div className="progress-bar" style={{width: `${progress}%`}}></div>
-                    </div>
-                    
-                    <div className="quiz-card">
-                        <div className="question-header">
-                            <span className="question-number">
-                                Câu {currentIndex + 1}/{questions.length}
-                            </span>
-                            <span className="question-type">
-                                {currentQuestion.type === 'tracNghiem' && '📝 Trắc Nghiệm'}
-                                {currentQuestion.type === 'dungSai' && '✓✗ Đúng - Sai'}
-                                {currentQuestion.type === 'traLoiNgan' && '✏️ Trả Lời Ngắn'}
-                            </span>
-                        </div>
-                        
-                        <div className="question-text">
-                            {currentQuestion.question}
-                        </div>
-                        
-                        {currentQuestion.image && (
-                            <img 
-                                src={currentQuestion.image} 
-                                alt="Hình minh họa" 
-                                className="question-image"
-                                onError={(e) => {
-                                    e.target.style.display = 'none';
-                                    console.log('Không tải được hình:', currentQuestion.image);
-                                }}
-                            />
-                        )}
-                        
-                        {currentQuestion.type === 'tracNghiem' && (
-                            <>
-                                <div className="options">
-                                    {currentQuestion.options.map((option, idx) => {
-                                        const isSelected = userAnswer === idx;
-                                        const isSubmitted = submitted[currentIndex];
-                                        const isCorrect = idx === currentQuestion.correct;
-                                        
-                                        let className = 'option';
-                                        if (isSelected && !isSubmitted) className += ' selected';
-                                        if (isSubmitted) {
-                                            className += ' disabled';
-                                            if (isCorrect) className += ' correct';
-                                            else if (isSelected) className += ' incorrect';
-                                        }
-                                        
-                                        return (
-                                            <div
-                                                key={idx}
-                                                className={className}
-                                                onClick={() => !isSubmitted && handleAnswer(idx)}
-                                            >
-                                                {String.fromCharCode(65 + idx)}. {option}
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                                
-                                {submitted[currentIndex] && (
-                                    <div className={`feedback-message ${userAnswer === currentQuestion.correct ? 'correct' : 'incorrect'}`}>
-                                        {userAnswer === currentQuestion.correct 
-                                            ? '✅ Chính xác! Tuyệt vời!' 
-                                            : `❌ Chưa đúng! Đáp án đúng là: ${String.fromCharCode(65 + currentQuestion.correct)}`
-                                        }
-                                    </div>
-                                )}
-                                
-                                {!submitted[currentIndex] && userAnswer !== undefined && (
-                                    <div className="controls">
-                                        <button className="btn btn-success" onClick={submitAnswer}>
-                                            ✓ Kiểm Tra Đáp Án
-                                        </button>
-                                    </div>
-                                )}
-                            </>
-                        )}
-                        
-                        {currentQuestion.type === 'dungSai' && (
-                            <>
-                                <div className="true-false-grid">
-                                    {currentQuestion.statements.map((statement, idx) => {
-                                        const isSubmitted = submitted[currentIndex];
-                                        const userChoice = userAnswer?.[idx];
-                                        const correctChoice = currentQuestion.correct[idx];
-                                        
-                                        return (
-                                            <div key={idx}>
-                                                <div className="tf-statement">
-                                                    {String.fromCharCode(97 + idx)}. {statement}
-                                                </div>
-                                                <div className="tf-buttons">
-                                                    <button
-                                                        className={`tf-btn ${
-                                                            userChoice === true && !isSubmitted ? 'selected-true' : ''
-                                                        } ${
-                                                            isSubmitted && correctChoice === true ? 'correct' : ''
-                                                        } ${
-                                                            isSubmitted && userChoice === true && correctChoice === false ? 'incorrect' : ''
-                                                        } ${isSubmitted ? 'disabled' : ''}`}
-                                                        onClick={() => {
-                                                            if (isSubmitted) return;
-                                                            const newAnswer = [...(userAnswer || [false, false, false, false])];
-                                                            newAnswer[idx] = true;
-                                                            handleAnswer(newAnswer);
-                                                        }}
-                                                        disabled={isSubmitted}
-                                                    >
-                                                        ✓ Đúng
-                                                    </button>
-                                                    <button
-                                                        className={`tf-btn ${
-                                                            userChoice === false && !isSubmitted ? 'selected-false' : ''
-                                                        } ${
-                                                            isSubmitted && correctChoice === false ? 'correct' : ''
-                                                        } ${
-                                                            isSubmitted && userChoice === false && correctChoice === true ? 'incorrect' : ''
-                                                        } ${isSubmitted ? 'disabled' : ''}`}
-                                                        onClick={() => {
-                                                            if (isSubmitted) return;
-                                                            const newAnswer = [...(userAnswer || [false, false, false, false])];
-                                                            newAnswer[idx] = false;
-                                                            handleAnswer(newAnswer);
-                                                        }}
-                                                        disabled={isSubmitted}
-                                                    >
-                                                        ✗ Sai
-                                                    </button>
-                                                </div>
-                                            </div>
-                                        );
-                                    })}
-                                </div>
-                                
-                                {submitted[currentIndex] && (
-                                    <div className={`feedback-message ${
-                                        JSON.stringify(userAnswer) === JSON.stringify(currentQuestion.correct) ? 'correct' : 'incorrect'
-                                    }`}>
-                                        {JSON.stringify(userAnswer) === JSON.stringify(currentQuestion.correct)
-                                            ? '✅ Chính xác tất cả! Xuất sắc!'
-                                            : '❌ Có phương án chưa đúng! Hãy xem lại đáp án đúng được highlight màu xanh.'
-                                        }
-                                    </div>
-                                )}
-                                
-                                {!submitted[currentIndex] && userAnswer && userAnswer.length === 4 && (
-                                    <div className="controls">
-                                        <button className="btn btn-success" onClick={submitAnswer}>
-                                            ✓ Kiểm Tra Đáp Án
-                                        </button>
-                                    </div>
-                                )}
-                            </>
-                        )}
-                        
-                        {currentQuestion.type === 'traLoiNgan' && (
-                            <div className="short-answer-container">
-                                <div className="short-answer-inputs">
-                                    {[0, 1, 2, 3].map((position) => {
-                                        const isSubmitted = submitted[currentIndex];
-                                        const currentAnswer = userAnswer || ['', '', '', ''];
-                                        const fullAnswer = currentAnswer.join('');
-                                        const isCorrect = fullAnswer === currentQuestion.correct;
-                                        
-                                        return (
-                                            <input
-                                                key={position}
-                                                type="text"
-                                                className={`answer-input ${
-                                                    isSubmitted ? (isCorrect ? 'correct' : 'incorrect') : ''
-                                                } ${isSubmitted ? 'disabled' : ''}`}
-                                                placeholder="?"
-                                                value={currentAnswer[position] || ''}
-                                                maxLength={1}
-                                                onChange={(e) => {
-                                                    if (isSubmitted) return;
-                                                    const value = e.target.value;
-                                                    if (/^[-,0-9]?$/.test(value)) {
-                                                        const newAnswer = [...currentAnswer];
-                                                        newAnswer[position] = value;
-                                                        handleAnswer(newAnswer);
-                                                        
-                                                        // Auto focus next input
-                                                        if (value && position < 3) {
-                                                            const nextInput = e.target.parentElement.children[position + 1];
-                                                            if (nextInput) nextInput.focus();
-                                                        }
-                                                    }
-                                                }}
-                                                onKeyDown={(e) => {
-                                                    if (e.key === 'Backspace' && !currentAnswer[position] && position > 0) {
-                                                        const prevInput = e.target.parentElement.children[position - 1];
-                                                        if (prevInput) prevInput.focus();
-                                                    }
-                                                }}
-                                                disabled={isSubmitted}
-                                            />
-                                        );
-                                    })}
-                                </div>
-                                
-                                <div className="short-answer-hint">
-                                    💡 Nhập từng số/ký tự vào mỗi ô (có thể dùng dấu trừ "-" và dấu phẩy ",")
-                                </div>
-                                
-                                {currentQuestion.unit && (
-                                    <div className="short-answer-unit">
-                                        Đơn vị: {currentQuestion.unit}
-                                    </div>
-                                )}
-                                
-                                {submitted[currentIndex] && (
-                                    <>
-                                        <div className={`feedback-message ${
-                                            (userAnswer || []).join('') === currentQuestion.correct ? 'correct' : 'incorrect'
-                                        }`}>
-                                            {(userAnswer || []).join('') === currentQuestion.correct
-                                                ? '✅ Chính xác! Tuyệt vời!'
-                                                : `❌ Chưa đúng!`
-                                            }
-                                        </div>
-                                        {(userAnswer || []).join('') !== currentQuestion.correct && (
-                                            <div className="correct-answer-display">
-                                                Đáp án đúng: {currentQuestion.correct} {currentQuestion.unit}
-                                            </div>
-                                        )}
-                                    </>
-                                )}
-                                
-                                {!submitted[currentIndex] && userAnswer && userAnswer.some(val => val !== '') && (
-                                    <div className="controls">
-                                        <button className="btn btn-success" onClick={submitAnswer}>
-                                            ✓ Kiểm Tra Đáp Án
-                                        </button>
-                                    </div>
-                                )}
-                            </div>
-                        )}
-                        
-                        <div className="controls">
-                            <button 
-                                className="btn btn-secondary" 
-                                onClick={prevQuestion}
-                                disabled={currentIndex === 0}
-                            >
-                                ← Câu Trước
-                            </button>
-                            
-                            {currentIndex < questions.length - 1 ? (
-                                <button className="btn btn-primary" onClick={nextQuestion}>
-                                    Câu Sau →
-                                </button>
-                            ) : (
-                                <button 
-                                    className="btn btn-success" 
-                                    onClick={calculateScore}
-                                    disabled={!allQuestionsSubmitted()}
-                                >
-                                    {allQuestionsSubmitted() ? '🎯 Xem Kết Quả' : '⏳ Hoàn thành tất cả câu'}
-                                </button>
-                            )}
-                        </div>
-                        
-                        {submitted[currentIndex] && (
-                            <div className="answered-badge">
-                                ✓ Đã trả lời
-                            </div>
-                        )}
-                    </div>
-                </div>
-            );
-        }
+function startQuiz() {
+  questions = prepareQuestions(selectedMode);
+  qIdx = 0;
+  answers = new Array(questions.length).fill(null);
+  buildSegDots();
+  showScreen('quiz-screen');
+  renderQuestion();
+}
 
-        const root = ReactDOM.createRoot(document.getElementById('root'));
-        root.render(<QuizApp />);
-    </script>
+function buildSegDots() {
+  const seg = document.getElementById('seg-progress');
+  seg.innerHTML = '';
+  questions.forEach((_, i) => {
+    const d = document.createElement('div');
+    d.className = 'seg-dot';
+    d.id = `dot-${i}`;
+    seg.appendChild(d);
+  });
+}
+
+function updateDot(i, state) {
+  const d = document.getElementById(`dot-${i}`);
+  if (d) { d.className = 'seg-dot ' + state; }
+}
+
+function renderQuestion() {
+  const q = questions[qIdx];
+  document.getElementById('q-cur').textContent = qIdx + 1;
+  document.getElementById('q-total').textContent = questions.length;
+  document.getElementById('cur-mode-badge').textContent = MODE_NAMES[selectedMode] || 'Tổng hợp';
+  document.getElementById('progress-bar').style.width = `${((qIdx) / questions.length) * 100}%`;
+
+  if (qIdx > 0 && answers[qIdx-1] !== null) {
+    const isCorrect = checkAnswer(qIdx-1);
+    updateDot(qIdx-1, isCorrect ? 'correct' : 'wrong');
+  }
+  updateDot(qIdx, 'current');
+
+  document.getElementById('q-text').textContent = q.question;
+  
+  // Image
+  const imgContainer = document.getElementById('q-image-container');
+  if (q.image) {
+    imgContainer.innerHTML = `<img src="${q.image}" alt="Hình minh họa" class="question-image">`;
+  } else {
+    imgContainer.innerHTML = '';
+  }
+
+  const content = document.getElementById('q-content');
+  content.innerHTML = '';
+
+  if (q.type === 'tracNghiem') {
+    renderMultipleChoice(q, content);
+  } else if (q.type === 'dungSai') {
+    renderTrueFalse(q, content);
+  } else if (q.type === 'traLoiNgan') {
+    renderShortAnswer(q, content);
+  }
+
+  document.getElementById('feedback-box').className = 'feedback-box';
+  document.getElementById('feedback-box').innerHTML = '';
+  document.getElementById('btn-next').classList.remove('show');
+  document.getElementById('question-card').style.animation = 'none';
+  void document.getElementById('question-card').offsetWidth;
+  document.getElementById('question-card').style.animation = '';
+}
+
+function renderMultipleChoice(q, container) {
+  const opts = document.createElement('div');
+  opts.className = 'options';
+  q.options.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'option-btn';
+    btn.innerHTML = `<span class="opt-label">${LABELS[i]}</span><span>${opt}</span>`;
+    btn.addEventListener('click', () => selectMultipleChoice(i));
+    opts.appendChild(btn);
+  });
+  container.appendChild(opts);
+}
+
+function selectMultipleChoice(idx) {
+  if (answers[qIdx] !== null) return;
+  answers[qIdx] = idx;
+  const q = questions[qIdx];
+  const btns = document.querySelectorAll('.option-btn');
+
+  btns.forEach((btn, i) => {
+    if (i === q.correct) btn.classList.add('correct');
+    else if (i === idx && idx !== q.correct) btn.classList.add('wrong');
+    else btn.classList.add('disabled-plain');
+    btn.disabled = true;
+  });
+
+  showFeedback(idx === q.correct, `Đáp án đúng: ${LABELS[q.correct]}. ${q.options[q.correct]}`);
+}
+
+function renderTrueFalse(q, container) {
+  q.statements.forEach((stmt, idx) => {
+    const div = document.createElement('div');
+    div.style.marginBottom = '12px';
+    
+    const stmtDiv = document.createElement('div');
+    stmtDiv.className = 'tf-statement';
+    stmtDiv.textContent = `${String.fromCharCode(97 + idx)}. ${stmt}`;
+    div.appendChild(stmtDiv);
+    
+    const btnsDiv = document.createElement('div');
+    btnsDiv.className = 'tf-buttons';
+    
+    const btnTrue = document.createElement('button');
+    btnTrue.className = 'tf-btn';
+    btnTrue.textContent = '✓ Đúng';
+    btnTrue.onclick = () => selectTrueFalse(idx, true);
+    
+    const btnFalse = document.createElement('button');
+    btnFalse.className = 'tf-btn';
+    btnFalse.textContent = '✗ Sai';
+    btnFalse.onclick = () => selectTrueFalse(idx, false);
+    
+    btnsDiv.appendChild(btnTrue);
+    btnsDiv.appendChild(btnFalse);
+    div.appendChild(btnsDiv);
+    container.appendChild(div);
+  });
+  
+  const checkBtn = document.createElement('button');
+  checkBtn.className = 'btn-check';
+  checkBtn.id = 'btn-check-tf';
+  checkBtn.textContent = '✓ Kiểm tra đáp án';
+  checkBtn.onclick = submitTrueFalse;
+  container.appendChild(checkBtn);
+}
+
+function selectTrueFalse(idx, value) {
+  if (!answers[qIdx]) answers[qIdx] = [null, null, null, null];
+  answers[qIdx][idx] = value;
+  
+  const btns = document.querySelectorAll('.tf-buttons')[idx].children;
+  btns[0].classList.remove('selected-true');
+  btns[1].classList.remove('selected-false');
+  if (value === true) btns[0].classList.add('selected-true');
+  else btns[1].classList.add('selected-false');
+  
+  // Check if all answered
+  if (answers[qIdx].every(a => a !== null)) {
+    document.getElementById('btn-check-tf').classList.add('show');
+  }
+}
+
+function submitTrueFalse() {
+  const q = questions[qIdx];
+  const userAnswer = answers[qIdx];
+  if (!userAnswer || userAnswer.some(a => a === null)) return;
+  
+  document.getElementById('btn-check-tf').style.display = 'none';
+  
+  const allBtns = document.querySelectorAll('.tf-buttons');
+  q.correct.forEach((correctVal, idx) => {
+    const btns = allBtns[idx].children;
+    btns[0].classList.add('disabled');
+    btns[1].classList.add('disabled');
+    
+    if (correctVal === true) {
+      btns[0].classList.add('correct');
+      if (userAnswer[idx] === false) btns[1].classList.add('wrong');
+    } else {
+      btns[1].classList.add('correct');
+      if (userAnswer[idx] === true) btns[0].classList.add('wrong');
+    }
+  });
+  
+  const isCorrect = JSON.stringify(userAnswer) === JSON.stringify(q.correct);
+  showFeedback(isCorrect, `Đáp án: ${q.correct.map((c, i) => `${String.fromCharCode(97+i)}: ${c ? 'Đúng' : 'Sai'}`).join(', ')}`);
+}
+
+function renderShortAnswer(q, container) {
+  const answerContainer = document.createElement('div');
+  answerContainer.className = 'short-answer-container';
+  
+  const inputsDiv = document.createElement('div');
+  inputsDiv.className = 'short-answer-inputs';
+  
+  for (let i = 0; i < 4; i++) {
+    const input = document.createElement('input');
+    input.type = 'text';
+    input.className = 'answer-input';
+    input.maxLength = 1;
+    input.dataset.pos = i;
+    input.addEventListener('input', (e) => handleShortAnswerInput(e, i));
+    input.addEventListener('keydown', (e) => handleShortAnswerKeydown(e, i));
+    inputsDiv.appendChild(input);
+  }
+  answerContainer.appendChild(inputsDiv);
+  
+  const hint = document.createElement('div');
+  hint.className = 'short-answer-hint';
+  hint.textContent = '💡 Nhập từng ký tự vào mỗi ô (số 0-9, dấu "-", dấu ",")';
+  answerContainer.appendChild(hint);
+  
+  if (q.unit) {
+    const unit = document.createElement('div');
+    unit.className = 'short-answer-unit';
+    unit.textContent = `Đơn vị: ${q.unit}`;
+    answerContainer.appendChild(unit);
+  }
+  
+  const checkBtn = document.createElement('button');
+  checkBtn.className = 'btn-check';
+  checkBtn.id = 'btn-check-sa';
+  checkBtn.textContent = '✓ Kiểm tra đáp án';
+  checkBtn.onclick = submitShortAnswer;
+  answerContainer.appendChild(checkBtn);
+  
+  container.appendChild(answerContainer);
+}
+
+function handleShortAnswerInput(e, pos) {
+  let value = e.target.value;
+  // Chỉ giữ lại ký tự cuối cùng gõ vào (nếu có)
+  if (value.length > 1) {
+    value = value[value.length - 1];
+  }
+
+  // Ràng buộc: chỉ cho số, "-", ","
+  if (!/^[-,0-9,]$/.test(value)) {
+    e.target.value = '';
+    return;
+  }
+
+  // Ràng buộc vị trí:
+  // - Ô đầu (pos === 0) KHÔNG được là ","
+  // - 3 ô sau (pos > 0) KHÔNG được là "-"
+  if ((pos === 0 && value === ',') || (pos > 0 && value === '-')) {
+    e.target.value = '';
+    return;
+  }
+
+  e.target.value = value;
+  
+  if (!answers[qIdx]) answers[qIdx] = ['', '', '', ''];
+  answers[qIdx][pos] = value || '';
+  
+  // Luôn nhảy sang ô tiếp theo nếu có nhập 1 ký tự hợp lệ
+  if (value && pos < 3) {
+    const inputs = document.querySelectorAll('.answer-input');
+    inputs[pos + 1].focus();
+  }
+  
+  if (answers[qIdx].some(v => v !== '')) {
+    document.getElementById('btn-check-sa').classList.add('show');
+  }
+}
+
+function handleShortAnswerKeydown(e, pos) {
+  if (e.key === 'Backspace' && !e.target.value && pos > 0) {
+    const inputs = document.querySelectorAll('.answer-input');
+    inputs[pos - 1].focus();
+  }
+}
+
+function submitShortAnswer() {
+  const q = questions[qIdx];
+  // Đọc trực tiếp từ các ô input để tránh sai lệch mảng answers
+  const inputs = Array.from(document.querySelectorAll('.answer-input'));
+  const userChars = inputs.map(inp => inp.value || '');
+  const userAnswer = userChars.join('');
+  const correctAnswer = q.correct;
+  
+  document.getElementById('btn-check-sa').style.display = 'none';
+  
+  // Cập nhật lại answers[qIdx] cho thống nhất với checkAnswer / review
+  answers[qIdx] = userChars;
+
+  const inputsNodeList = document.querySelectorAll('.answer-input');
+  const isCorrect = normalizeNumberAnswer(userAnswer) === normalizeNumberAnswer(correctAnswer);
+  
+  inputsNodeList.forEach(input => {
+    input.disabled = true;
+    input.classList.add('disabled');
+    input.classList.add(isCorrect ? 'correct' : 'incorrect');
+  });
+  
+  if (!isCorrect) {
+    const answerDiv = document.createElement('div');
+    answerDiv.className = 'correct-answer-display';
+    answerDiv.textContent = `Đáp án đúng: ${correctAnswer} ${q.unit || ''}`;
+    document.querySelector('.short-answer-container').appendChild(answerDiv);
+  }
+  
+  showFeedback(isCorrect, `Đáp án đúng: ${correctAnswer} ${q.unit || ''}`);
+}
+
+function showFeedback(isCorrect, correctInfo) {
+  const fb = document.getElementById('feedback-box');
+  if (isCorrect) {
+    fb.className = 'feedback-box show correct-fb';
+    fb.innerHTML = '✅ Chính xác! Bạn đã trả lời đúng.';
+  } else {
+    fb.className = 'feedback-box show wrong-fb';
+    fb.innerHTML = `❌ Sai rồi. ${correctInfo}`;
+  }
+
+  const btnNext = document.getElementById('btn-next');
+  btnNext.classList.add('show');
+  btnNext.textContent = qIdx === questions.length - 1 ? '🏁 Xem kết quả' : 'Câu tiếp theo →';
+}
+
+function checkAnswer(idx) {
+  const q = questions[idx];
+  const ans = answers[idx];
+  
+  if (q.type === 'tracNghiem') {
+    return ans === q.correct;
+  } else if (q.type === 'dungSai') {
+    return ans && JSON.stringify(ans) === JSON.stringify(q.correct);
+  } else if (q.type === 'traLoiNgan') {
+    return normalizeNumberAnswer((ans || []).join('')) === normalizeNumberAnswer(q.correct);
+  }
+  return false;
+}
+
+document.getElementById('btn-next').addEventListener('click', () => {
+  if (qIdx < questions.length - 1) {
+    qIdx++;
+    renderQuestion();
+  } else {
+    showResults();
+  }
+});
+
+function showResults() {
+  const correct = answers.filter((a, i) => checkAnswer(i)).length;
+  const total = questions.length;
+  const pct = Math.round((correct / total) * 100);
+
+  const circumference = 2 * Math.PI * 65;
+  const fill = document.getElementById('ring-fill');
+  fill.style.strokeDasharray = circumference;
+  fill.style.strokeDashoffset = circumference;
+  
+  if (pct >= 80) fill.style.stroke = '#3fb950';
+  else if (pct >= 60) fill.style.stroke = '#e6ac2c';
+  else fill.style.stroke = '#f85149';
+
+  document.getElementById('ring-pct').textContent = pct + '%';
+  document.getElementById('rs-correct').textContent = correct;
+  document.getElementById('rs-wrong').textContent = total - correct;
+  document.getElementById('rs-total').textContent = total;
+
+  let title, sub;
+  if (pct >= 90) { title = '🏆 Xuất sắc!'; sub = 'Bạn đã nắm vững kiến thức. Tuyệt vời!'; }
+  else if (pct >= 80) { title = '🌟 Giỏi lắm!'; sub = 'Kết quả rất tốt, tiếp tục phát huy!'; }
+  else if (pct >= 60) { title = '👍 Khá tốt!'; sub = 'Bạn đã vượt qua. Cố gắng hơn nữa!'; }
+  else { title = '📚 Cần cố gắng thêm!'; sub = 'Hãy ôn lại và thử lại nhé!'; }
+
+  document.getElementById('result-title').textContent = title;
+  document.getElementById('result-sub').textContent = sub;
+
+  // Review
+  const reviewList = document.getElementById('review-list');
+  reviewList.innerHTML = '';
+  const wrongOnes = questions.map((q, i) => ({ q, ans: answers[i], i })).filter(({ q, ans, i }) => !checkAnswer(i));
+  
+  if (wrongOnes.length === 0) {
+    reviewList.innerHTML = '<p style="color:var(--green);font-weight:600;">🎉 Bạn không có câu nào sai!</p>';
+  } else {
+    wrongOnes.forEach(({ q, ans, i }) => {
+      const div = document.createElement('div');
+      div.className = 'review-item';
+      
+      let wrongText = '', rightText = '';
+      if (q.type === 'tracNghiem') {
+        wrongText = `${LABELS[ans]}. ${q.options[ans]}`;
+        rightText = `${LABELS[q.correct]}. ${q.options[q.correct]}`;
+      } else if (q.type === 'dungSai') {
+        wrongText = 'Có phương án sai';
+        rightText = q.correct.map((c, idx) => `${String.fromCharCode(97 + idx)}: ${c ? 'Đúng' : 'Sai'}`).join(', ');
+      } else {
+        wrongText = (ans || []).join('');
+        rightText = q.correct;
+      }
+      
+      div.innerHTML = `
+        <div class="ri-q">Câu ${i + 1}: ${q.question}</div>
+        <div class="ri-row ri-wrong-ans">❌ Bạn trả lời: ${wrongText}</div>
+        <div class="ri-row ri-right-ans">✅ Đáp án đúng: ${rightText}</div>
+      `;
+      reviewList.appendChild(div);
+    });
+  }
+
+  showScreen('result-screen');
+
+  requestAnimationFrame(() => {
+    setTimeout(() => {
+      fill.style.strokeDashoffset = circumference - (pct / 100) * circumference;
+    }, 100);
+  });
+}
+</script>
 </body>
 </html>
